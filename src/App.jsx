@@ -66,7 +66,7 @@ function App() {
                 {renderPage()}
             </main>
 
-            {cartItems.length > 0 && (
+            {cartItems.length > 0 && currentPage != 'cart' && (
                 <ShoppingCart
                     cartItems={cartItems}
                     onRemoveItem={removeFromCart}
