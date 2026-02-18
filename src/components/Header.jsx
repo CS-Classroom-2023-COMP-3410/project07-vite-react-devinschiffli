@@ -1,5 +1,7 @@
 import React from 'react';
-function Header({ currentPage, onNavigate }) {
+
+function Header({ currentPage, onNavigate, cartCount }) {
+
     const navStyle = {
         display: 'flex',
         justifyContent: 'space-between',
@@ -11,7 +13,8 @@ function Header({ currentPage, onNavigate }) {
     const navItems = [
         { id: 'home', label: 'Home' },
         { id: 'products', label: 'Products' },
-        { id: 'profile', label: 'Profile' }
+        { id: 'profile', label: 'Profile' },
+        { id: 'cart', label: `Cart (${cartCount})` }
     ];
 
     return (
@@ -19,8 +22,15 @@ function Header({ currentPage, onNavigate }) {
             <div style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
                 React Multi-Page Demo
             </div>
+
             <nav>
-                <ul style={{ display: 'flex', gap: '15px', listStyle: 'none', margin: 0, padding: 0 }}>
+                <ul style={{
+                    display: 'flex',
+                    gap: '15px',
+                    listStyle: 'none',
+                    margin: 0,
+                    padding: 0
+                }}>
                     {navItems.map(item => (
                         <li key={item.id}>
                             <a
