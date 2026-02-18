@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Card from '../components/Card';
 import Button from '../components/Button';
 
-function ProductsPage() {
+function ProductsPage({ onAddToCart }) {
+
     // Sample product data
     const initialProducts = [
         {
@@ -40,7 +41,6 @@ function ProductsPage() {
     ];
 
     const [products, setProducts] = useState(initialProducts);
-    const [cart, setCart] = useState([]);
     const [sortBy, setSortBy] = useState('default');
 
     // Sort products based on selected option
@@ -53,6 +53,7 @@ function ProductsPage() {
 
     // Add product to cart
     const addToCart = (product) => {
+
         // Check if product has stock
         const productInState = products.find(p => p.id === product.id);
         if (productInState.stock <= 0) return;
@@ -62,48 +63,17 @@ function ProductsPage() {
             p.id === product.id ? { ...p, stock: p.stock - 1 } : p
         ));
 
-        // Add to cart
-        const existingItem = cart.find(item => item.id === product.id);
-        if (existingItem) {
-            setCart(cart.map(item =>
-                item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-            ));
-        } else {
-            setCart([...cart, { ...product, quantity: 1 }]);
-        }
+        // Send product to global cart (App.jsx now manages cart state)
+        onAddToCart(product);
     };
-
-    // Remove product from cart
-    const removeFromCart = (productId) => {
-        const item = cart.find(item => item.id === productId);
-        if (!item) return;
-
-        // Update product stock
-        setProducts(products.map(p =>
-            p.id === productId ? { ...p, stock: p.stock + 1 } : p
-        ));
-
-        // Update cart
-        if (item.quantity > 1) {
-            setCart(cart.map(item =>
-                item.id === productId ? { ...item, quantity: item.quantity - 1 } : item
-            ));
-        } else {
-            setCart(cart.filter(item => item.id !== productId));
-        }
-    };
-
-    // Calculate total price
-    const totalPrice = cart.reduce(
-        (total, item) => total + (item.price * item.quantity),
-        0
-    );
 
     return (
         <div>
             <h1>Products Page</h1>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                
+                {/* Sorting controls */}
                 <div>
                     <label htmlFor="sort-select" style={{ marginRight: '10px' }}>Sort by:</label>
                     <select
@@ -119,12 +89,10 @@ function ProductsPage() {
                     </select>
                 </div>
 
-                <div>
-                    <strong>Cart ({cart.reduce((total, item) => total + item.quantity, 0)} items)</strong>
-                </div>
             </div>
 
             <div style={{ display: 'flex', gap: '30px' }}>
+
                 {/* Products listing */}
                 <div style={{ flex: '1', display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
                     {sortedProducts.map(product => (
@@ -147,64 +115,6 @@ function ProductsPage() {
                     ))}
                 </div>
 
-                {/* Cart sidebar */}
-                <div style={{
-                    width: '300px',
-                    padding: '15px',
-                    backgroundColor: '#f8f9fa',
-                    borderRadius: '8px',
-                    alignSelf: 'flex-start'
-                }}>
-                    <h3>Shopping Cart</h3>
-
-                    {cart.length === 0 ? (
-                        <p>Your cart is empty</p>
-                    ) : (
-                        <>
-                            <ul style={{ padding: 0, listStyle: 'none' }}>
-                                {cart.map(item => (
-                                    <li key={item.id} style={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        padding: '8px 0',
-                                        borderBottom: '1px solid #ddd'
-                                    }}>
-                                        <div>
-                                            <strong>{item.title}</strong> × {item.quantity}
-                                            <div>${item.price * item.quantity}</div>
-                                        </div>
-                                        <Button
-                                            onClick={() => removeFromCart(item.id)}
-                                            variant="danger"
-                                        >
-                                            −
-                                        </Button>
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <div style={{
-                                marginTop: '15px',
-                                padding: '10px 0',
-                                borderTop: '2px solid #ddd',
-                                display: 'flex',
-                                justifyContent: 'space-between'
-                            }}>
-                                <strong>Total:</strong>
-                                <strong>${totalPrice}</strong>
-                            </div>
-
-                            <Button
-                                onClick={() => alert(`Checkout completed for $${totalPrice}!`)}
-                                variant="success"
-                                style={{ width: '100%', marginTop: '10px' }}
-                            >
-                                Checkout
-                            </Button>
-                        </>
-                    )}
-                </div>
             </div>
         </div>
     );
